@@ -11,38 +11,34 @@ from  typing import Literal
 from langchain_core.runnables import RunnableParallel, RunnableBranch, RunnableLambda,RunnableSequence, RunnablePassthrough
 import time
 from langchain_google_genai import ChatGoogleGenerativeAI
-
+from langchain_community.document_loaders import TextLoader
 
 
 load_dotenv()
 
 llm = ChatGoogleGenerativeAI(
-    model = "gemini-3.5-flash",
+    model = "gemini-3.6-flash",
     api_key = SecretStr(os.environ["GOOGLE_API_KEY"]),
 
 )
 
-parser = StrOutputParser()
-
-prompt1 = PromptTemplate(
-    template = "Write a detailed report on {topic}",   
+prompt = PromptTemplate(
+    template = "Write a summary for the following {topic}  ",
     input_variables = ['topic']
 )
+parser = StrOutputParser()
 
-prompt2 = PromptTemplate(
-    template = "Summarize the following text in 50 words \n {text}",
-    input_variables = ['text']
-)
+chain = prompt | llm | parser
 
-summarize_chain = RunnableSequence(prompt2, llm, parser)
-report_gen_chain = RunnableSequence(prompt1, llm, parser)
 
-branch_chain = RunnableBranch(
-    (lambda x : len(x.split()) > 500 , summarize_chain),
-    RunnablePassthrough()
 
-)
 
-final_result = RunnableSequence(report_gen_chain, branch_chain).invoke({"topic": "India"})
+loader = TextLoader("document_loader/sample.txt", encoding="utf-8")
+documents = loader.load() # as documents store karega memory mein
 
-print(final_result)
+print("Meta data of the file is :\\n",documents[0].metadata)
+print("")
+
+
+
+print(chain.invoke({"topic" : documents[0].page_content})) # print karega summary of the document

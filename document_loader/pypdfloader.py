@@ -11,38 +11,20 @@ from  typing import Literal
 from langchain_core.runnables import RunnableParallel, RunnableBranch, RunnableLambda,RunnableSequence, RunnablePassthrough
 import time
 from langchain_google_genai import ChatGoogleGenerativeAI
-
+from langchain_community.document_loaders import TextLoader, PyPDFLoader
 
 
 load_dotenv()
 
 llm = ChatGoogleGenerativeAI(
-    model = "gemini-3.5-flash",
+    model = "gemini-3.6-flash",
     api_key = SecretStr(os.environ["GOOGLE_API_KEY"]),
 
 )
 
-parser = StrOutputParser()
+loader = PyPDFLoader("document_loader/Data Analyst in 90 days PDF.pdf")
+documents = loader.load() 
 
-prompt1 = PromptTemplate(
-    template = "Write a detailed report on {topic}",   
-    input_variables = ['topic']
-)
-
-prompt2 = PromptTemplate(
-    template = "Summarize the following text in 50 words \n {text}",
-    input_variables = ['text']
-)
-
-summarize_chain = RunnableSequence(prompt2, llm, parser)
-report_gen_chain = RunnableSequence(prompt1, llm, parser)
-
-branch_chain = RunnableBranch(
-    (lambda x : len(x.split()) > 500 , summarize_chain),
-    RunnablePassthrough()
-
-)
-
-final_result = RunnableSequence(report_gen_chain, branch_chain).invoke({"topic": "India"})
-
-print(final_result)
+print(documents[0].page_content) # print karega content of the document
+print("Meta data of the file is :\\n",documents[0].metadata)
+# print(len(documents))
