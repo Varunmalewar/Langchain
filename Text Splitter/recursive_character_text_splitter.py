@@ -31,5 +31,5 @@ splitter = RecursiveCharacterTextSplitter(
 chunks = splitter.split_text("This is a sample text that will be split into chunks using the RecursiveCharacterTextSplitter. The chunk size is set to 100 characters, and there is no overlap between the chunks. This means that each chunk will contain a maximum of 100 characters, and the next chunk will start immediately after the previous one ends. This is useful for processing large texts in smaller, manageable pieces.")
 
 print(len(chunks)) # it will print the number of chunks created from the text
-print(chunks[0])
+print(chunks[0]) 
 
