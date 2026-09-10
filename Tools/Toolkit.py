@@ -24,4 +24,4 @@ for tool in tools :
     print(f"Tool Description : {tool.description}")
     print(f"Tool Args : {tool.args}")
     print(f"Tool Args Schema : {tool.args_schema.model_json_schema()}")
-    print("\n")
+    
